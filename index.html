@@ -76,6 +76,16 @@
   .hero .lead{font-size:clamp(18px,2.4vw,22px);color:var(--ink-soft);max-width:620px;margin:22px 0 34px}
   .hero-cta{display:flex;gap:14px;flex-wrap:wrap}
   .hero-note{margin-top:22px;font-size:14px;color:var(--ink-soft);display:flex;align-items:center;gap:8px}
+  /* обратный отсчёт */
+  .countdown{margin-top:34px}
+  .cd-label{display:inline-flex;align-items:center;gap:8px;font-size:14px;font-weight:800;letter-spacing:.03em;color:var(--accent);margin-bottom:14px;text-transform:uppercase}
+  .cd-units{display:flex;gap:10px}
+  .cd-box{background:var(--ink);color:#fff;border-radius:14px;padding:13px 14px;min-width:74px;text-align:center;box-shadow:0 12px 28px -16px rgba(29,43,54,.75)}
+  .cd-num{display:block;font-size:32px;font-weight:800;line-height:1;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+  .cd-cap{display:block;font-size:11px;color:#b9c6cf;margin-top:7px;letter-spacing:.08em;text-transform:uppercase}
+  .cd-note{margin-top:14px;font-size:14px;color:var(--ink-soft);display:flex;align-items:center;gap:8px}
+  .cd-done{font-size:18px;font-weight:800;color:var(--accent)}
+  @media(max-width:480px){.cd-box{min-width:0;flex:1 1 0;padding:12px 4px}.cd-num{font-size:24px}.cd-cap{font-size:10px}}
   .pulse{width:9px;height:9px;border-radius:50%;background:var(--wa);box-shadow:0 0 0 0 rgba(37,211,102,.6);animation:pulse 2.4s infinite}
   @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(37,211,102,.5)}70%{box-shadow:0 0 0 12px rgba(37,211,102,0)}100%{box-shadow:0 0 0 0 rgba(37,211,102,0)}}
   /* волны-фон */
@@ -276,7 +286,16 @@
       <a href="#price" class="btn btn-accent">Узнать про практикум</a>
       <a href="#quiz" class="btn btn-ghost">Пройти диагностику →</a>
     </div>
-    <div class="hero-note"><span class="pulse"></span> Старт потока 17 июня · бесплатная консультация перед записью</div>
+    <div class="countdown" id="countdown" data-target="2026-06-17T00:00:00">
+      <div class="cd-label">⏳ До старта потока · 17 июня</div>
+      <div class="cd-units">
+        <div class="cd-box"><span class="cd-num" id="cdD">00</span><span class="cd-cap">дней</span></div>
+        <div class="cd-box"><span class="cd-num" id="cdH">00</span><span class="cd-cap">часов</span></div>
+        <div class="cd-box"><span class="cd-num" id="cdM">00</span><span class="cd-cap">минут</span></div>
+        <div class="cd-box"><span class="cd-num" id="cdS">00</span><span class="cd-cap">секунд</span></div>
+      </div>
+      <div class="cd-note"><span class="pulse"></span> Бесплатная консультация перед записью · мест в потоке ограничено</div>
+    </div>
   </div>
   <svg class="waves" viewBox="0 0 1440 120" preserveAspectRatio="none" aria-hidden="true">
     <path fill="#efe7da" d="M0,64 C240,120 480,16 720,48 C960,80 1200,120 1440,72 L1440,120 L0,120 Z"></path>
@@ -747,6 +766,33 @@ function showResult(){
 }
 
 renderQuestion();
+
+/* =====================================================================
+   ОБРАТНЫЙ ОТСЧЁТ ДО СТАРТА ПОТОКА
+   Дата задаётся в data-target у #countdown (формат YYYY-MM-DDTHH:MM:SS).
+   ===================================================================== */
+(function(){
+  const el = document.getElementById("countdown");
+  if(!el) return;
+  const target = new Date(el.dataset.target).getTime();
+  const dE=document.getElementById("cdD"), hE=document.getElementById("cdH"),
+        mE=document.getElementById("cdM"), sE=document.getElementById("cdS");
+  const pad = n => String(n).padStart(2,"0");
+  function tick(){
+    const diff = target - Date.now();
+    if(diff <= 0){
+      el.innerHTML = '<div class="cd-done">🚀 Поток стартовал! Запишитесь на ближайшую консультацию — добираем участников.</div>';
+      clearInterval(timer);
+      return;
+    }
+    dE.textContent = pad(Math.floor(diff/86400000));
+    hE.textContent = pad(Math.floor(diff/3600000)%24);
+    mE.textContent = pad(Math.floor(diff/60000)%60);
+    sE.textContent = pad(Math.floor(diff/1000)%60);
+  }
+  tick();
+  const timer = setInterval(tick, 1000);
+})();
 
 /* =====================================================================
    ПОЯВЛЕНИЕ СЕКЦИЙ ПРИ СКРОЛЛЕ
